@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>365 Days</title>
+
+<style>
+body {
+    margin: 0;
+    background: radial-gradient(circle, #14001f, #050008);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    font-family: Arial;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(19, 16px);
+    gap: 10px;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #2a143a;
+    transition: 0.5s;
+}
+
+.past { background: #c77dff; }
+.today {
+    background: #b517ff;
+    box-shadow: 0 0 15px #b517ff;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    50% { box-shadow: 0 0 25px #b517ff; }
+}
+
+.info {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.info span {
+    color: #b517ff;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+
+<div class="info">
+    <div><span id="left"></span> days left</div>
+    <div><span id="percent"></span>% year completed</div>
+</div>
+
+<script>
+function leap(year) {
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+function draw() {
+    const grid = document.querySelector(".grid");
+    grid.innerHTML = "";
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const total = leap(year) ? 366 : 365;
+
+    const start = new Date(year, 0, 1);
+    const today = Math.floor((now - start) / 86400000) + 1;
+
+    for (let i = 1; i <= total; i++) {
+        let d = document.createElement("div");
+        d.className = "dot";
+        if (i < today) d.classList.add("past");
+        if (i === today) d.classList.add("today");
+        grid.appendChild(d);
+    }
+
+    document.getElementById("left").innerText = total - today;
+    document.getElementById("percent").innerText =
+        ((today / total) * 100).toFixed(1);
+}
+
+function autoUpdate() {
+    const now = new Date();
+    const next = new Date();
+    next.setHours(24, 0, 1, 0);
+    setTimeout(() => {
+        draw();
+        autoUpdate();
+    }, next - now);
+}
+
+draw();
+autoUpdate();
+</script>
+
+</body>
+</html>
